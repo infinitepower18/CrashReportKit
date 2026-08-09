@@ -3,11 +3,13 @@
 
 # CrashReportKit
 
-CrashReportKit is a Swift package for capturing, storing, and managing crash reports produced by Apple's [CrashReportExtension](https://developer.apple.com/documentation/CrashReportExtension) framework.
+CrashReportKit is a Swift package for creating and managing crash reports with Apple's [CrashReportExtension](https://developer.apple.com/documentation/CrashReportExtension) framework.
 
-The package generates human-readable JSON reports containing stack traces, symbols available on the device, ARM64 register state, exception information, process metadata, and relevant binary images. Unsymbolicated frames retain the addresses and binary-image metadata needed for offline symbolication with a matching dSYM. Apps can work with the storage APIs directly or add the optional SwiftUI interface for inspecting and sharing reports.
+When an app crashes, its Crash Report Extension uses CrashReportKit to inspect the crashed process and save a human-readable JSON report in a shared app-group container. Because this happens in the extension, the report can be persisted and acted on without waiting for the main app to launch again.
 
-Crash reports captured by CrashReportKit can be symbolicated using the [CrashReportKit Inspector](https://github.com/infinitepower18/CrashReportKit-Inspector) macOS app.
+Reports include thread backtraces, symbols available on the device, ARM64 register state, exception information, process metadata, and relevant binary images. Unsymbolicated frames retain their addresses and binary-image metadata for offline symbolication with a matching dSYM.
+
+Use the storage APIs to build a custom workflow, or add the optional SwiftUI product to let users inspect and share reports from the app. Crash reports can also be symbolicated locally with the [CrashReportKit Inspector](https://github.com/infinitepower18/CrashReportKit-Inspector) macOS app.
 
 > [!NOTE]
 > Apps containing CrashReportExtension cannot currently be uploaded to App Store Connect. (FB24235202)
@@ -15,6 +17,18 @@ Crash reports captured by CrashReportKit can be symbolicated using the [CrashRep
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F1K06VY)
 
 <img height="800" alt="Screenshot" src="https://github.com/user-attachments/assets/1bb0c38e-1bc7-40bd-a032-023282403e62" />
+
+## Why CrashReportKit?
+
+CrashReportKit is intended for apps that want control over crash processing without embedding a third-party crash reporter or depending on a hosted crash-monitoring service.
+
+- Crash handling runs out-of-process in Apple's Crash Report Extension.
+- Reports are saved locally and are not uploaded automatically.
+- The extension can process stored reports immediately, even if the main app is not reopened.
+- Apps control how reports are retained, presented, shared, or transmitted.
+- The core APIs, optional SwiftUI viewer, and extension integration are separate products.
+
+CrashReportKit is not an analytics dashboard or a replacement for every hosted crash service. It provides the local capture, storage, and presentation building blocks for developers who want to own that workflow.
 
 ## Requirements
 
@@ -30,11 +44,11 @@ Crash reports captured by CrashReportKit can be symbolicated using the [CrashRep
 
 CrashReportKit provides three focused library products:
 
-- `CrashReportKit` contains the underlying configuration, storage, and ZIP creation APIs. Use this product when building your own interface or integration.
-- `CrashReportKitUI` contains an optional SwiftUI viewer and depends on `CrashReportKit`.
-- `CrashReportKitExtension` contains the low-level crash processing, depends on `CrashReportKit`, and links Apple's `CrashReportExtension` framework.
+- `CrashReportKit` provides configuration, report storage, retention, and ZIP creation for custom integrations.
+- `CrashReportKitUI` provides an optional SwiftUI report viewer and depends on `CrashReportKit`.
+- `CrashReportKitExtension` creates reports from a crashed process, depends on `CrashReportKit`, and links Apple's `CrashReportExtension` framework.
 
-Choose only the products needed by each target. An app can link `CrashReportKit` directly and work with the reports via the provided APIs, or link `CrashReportKitUI` to use the included viewer. The Crash Report Extension target should link `CrashReportKitExtension`.
+Choose only the products needed by each target. An app can link `CrashReportKit` directly and provide its own interface, or link `CrashReportKitUI` to use the included viewer. The Crash Report Extension target should link `CrashReportKitExtension`.
 
 ## Installation
 
@@ -73,7 +87,7 @@ let crashReportConfiguration = CrashReportConfiguration(
 
 ## Crash reporter extension
 
-Keep the extension entry point in the extension target and delegate processing to the package:
+Keep the extension entry point in the extension target and delegate report creation to CrashReportKit:
 
 ```swift
 import CrashReportExtension
@@ -105,9 +119,20 @@ struct MyCrashReporter: CrashReporterExtension {
 
 The extension must use the same app-group identifier as the main app.
 
-## Using the APIs directly
+`CrashReportProcessor.process` completes its storage work synchronously. Extension code can then read the shared store and perform additional handling without waiting for the main app to open:
 
-The main app can load, share, or present reports using `CrashReportStore` without linking `CrashReportKitUI`:
+```swift
+CrashReportProcessor.process(process, configuration: crashReportConfiguration)
+
+let reports = try CrashReportStore.reports(configuration: crashReportConfiguration)
+// Apply your own export, redaction, or transmission policy.
+```
+
+Keep additional extension work within the system's execution, memory, entitlement, and networking constraints.
+
+## Working with stored reports
+
+Both the main app and the Crash Report Extension can access reports using `CrashReportStore`. The UI product is not required:
 
 ```swift
 import CrashReportKit
@@ -180,7 +205,7 @@ Symbol availability depends on the crashed binary. Debug builds may provide read
 
 ## Privacy
 
-CrashReportKit does not upload or transmit reports automatically. Reports remain in the shared app-group container until the user explicitly shares them or they are removed by retention.
+CrashReportKit does not upload or transmit reports automatically. Reports stay in the shared app-group container until application or extension code shares, transmits, or removes them, or retention pruning removes them.
 
 ## Platform notes
 
