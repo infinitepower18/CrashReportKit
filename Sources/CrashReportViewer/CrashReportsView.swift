@@ -10,7 +10,6 @@ public struct CrashReportsView: View {
     private let configuration: CrashReportConfiguration
     @State private var reports: [CrashReportFile] = []
     @State private var reportsArchive: URL?
-    @State private var errorMessage: String?
 
     /// Creates a crash-report viewer.
     ///
@@ -59,14 +58,6 @@ public struct CrashReportsView: View {
             }
         }
         .task { reload() }
-        .alert("Couldn't Share Crash Report", isPresented: Binding(
-            get: { errorMessage != nil },
-            set: { if !$0 { errorMessage = nil } }
-        )) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(errorMessage ?? "Unknown error")
-        }
     }
 
     private func reload() {
@@ -76,7 +67,9 @@ public struct CrashReportsView: View {
                 ? nil
                 : try CrashReportStore.zip(reports, configuration: configuration)
         } catch {
-            errorMessage = error.localizedDescription
+            #if DEBUG
+            print(error.localizedDescription)
+            #endif
         }
     }
 }
