@@ -14,7 +14,7 @@ public struct CrashReportsView: View {
 
     /// Creates a crash-report viewer.
     ///
-    /// - Parameter configuration: The shared storage and feedback-email configuration.
+    /// - Parameter configuration: The shared storage, retention, and display configuration.
     public init(configuration: CrashReportConfiguration) {
         self.configuration = configuration
     }
