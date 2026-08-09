@@ -10,7 +10,10 @@ import os
 /// Call ``process(_:configuration:logger:)`` from the `processCrashReport(process:)`
 /// method of a type conforming to `CrashReporterExtension`.
 public enum CrashReportProcessor {
-    /// Captures, symbolicates, saves, and prunes a crash report.
+    /// Captures, resolves available on-device symbols, saves, and prunes a crash report.
+    ///
+    /// Unsymbolicated frames retain their addresses and binary-image metadata for
+    /// offline symbolication with a matching dSYM.
     ///
     /// Reports are stored atomically in the app group's
     /// `Library/Application Support/Crash Reports` directory. Processing errors are
@@ -304,11 +307,9 @@ private struct ReportThread: Encodable {
     let registers: ARM64Registers; let frames: [ReportFrame]
 }
 
-// swiftlint:disable identifier_name
 private struct ARM64Registers: Encodable {
     let x: [UInt64]; let fp: UInt64; let lr: UInt64; let sp: UInt64; let pc: UInt64; let cpsr: UInt32
 }
-// swiftlint:enable identifier_name
 
 @available(iOS 27.0, *)
 private struct ReportFrame: Encodable {
