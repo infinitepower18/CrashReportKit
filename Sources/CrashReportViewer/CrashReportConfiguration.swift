@@ -75,7 +75,7 @@ public enum CrashReportStore {
         return directory
     }
 
-    /// Loads all valid JSON crash reports, newest first.
+    /// Loads all readable UTF-8 crash-report files with a `.json` extension, newest first.
     ///
     /// Files that are not regular JSON files or cannot be decoded as UTF-8 are ignored.
     ///
