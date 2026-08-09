@@ -59,7 +59,7 @@ public struct CrashReportsView: View {
             }
         }
         .task { reload() }
-        .alert("Couldn't Share Crash Report", isPresented: Binding(
+        .alert("Error", isPresented: Binding(
             get: { errorMessage != nil },
             set: { if !$0 { errorMessage = nil } }
         )) {
