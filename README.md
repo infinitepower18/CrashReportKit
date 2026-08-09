@@ -3,9 +3,15 @@
 
 # CrashReportKit
 
-CrashReportKit is a Swift package for creating and managing crash reports with Apple's [CrashReportExtension](https://developer.apple.com/documentation/CrashReportExtension) framework.
+CrashReportKit is a Swift package that turns the low-level `CrashedProcess` supplied by Apple's [CrashReportExtension](https://developer.apple.com/documentation/CrashReportExtension) framework into a complete, locally stored crash report with one API call.
 
-When an app crashes, its Crash Report Extension uses CrashReportKit to inspect the crashed process and save a human-readable JSON report in a shared app-group container. Because this happens in the extension, the report can be persisted and acted on without waiting for the main app to launch again.
+Apple provides access to the crashed process, but leaves report construction to the developer. CrashReportKit handles the underlying work: enumerating threads, reading ARM64 registers, unwinding stacks, matching frames to binary images, resolving available symbols, encoding a versioned JSON report, writing it atomically, and pruning older reports.
+
+```swift
+CrashReportProcessor.process(process, configuration: configuration)
+```
+
+The report is created inside the Crash Report Extension and saved in a shared app-group container. It can therefore be persisted and acted on without waiting for the main app to launch again.
 
 Reports include thread backtraces, symbols available on the device, ARM64 register state, exception information, process metadata, and relevant binary images. Unsymbolicated frames retain their addresses and binary-image metadata for offline symbolication with a matching dSYM.
 
@@ -18,15 +24,17 @@ Use the storage APIs to build a custom workflow, or add the optional SwiftUI pro
 
 ## Why CrashReportKit?
 
-CrashReportKit is intended for apps that want control over crash processing without embedding a third-party crash reporter or depending on a hosted crash-monitoring service.
+CrashReportKit removes the substantial amount of low-level code normally required to turn `CrashedProcess` into a useful report. It is intended for developers who want to use Apple's out-of-process crash handling without building their own unwinder, report schema, persistence layer, and user-facing workflow.
 
-- Crash handling runs out-of-process in Apple's Crash Report Extension.
-- Reports are saved locally and are not uploaded automatically.
-- The extension can process stored reports immediately, even if the main app is not reopened.
-- Apps control how reports are retained, presented, shared, or transmitted.
-- The core APIs, optional SwiftUI viewer, and extension integration are separate products.
+- **One-call report generation:** Convert `CrashedProcess` into a human-readable JSON report with `CrashReportProcessor.process`.
+- **Low-level crash inspection included:** Thread enumeration, ARM64 registers, stack unwinding, binary-image matching, and available symbol resolution are handled by the package.
+- **Versioned, portable output:** Reports use a predictable JSON format and retain the addresses, image offsets, and UUIDs needed for offline symbolication.
+- **Storage included:** Reports are written atomically to an app-group container and automatically pruned using a configurable retention limit.
+- **Crash-time availability:** The extension can process stored reports immediately, even if the main app is not reopened.
+- **Optional presentation:** Apps can use the storage APIs directly or add the separate SwiftUI viewer.
+- **Local-first by default:** CrashReportKit does not upload reports automatically; the app controls how they are retained, shared, or transmitted.
 
-CrashReportKit is not an analytics dashboard or a replacement for every hosted crash service. It provides the local capture, storage, and presentation building blocks for developers who want to own that workflow.
+CrashReportKit is not an analytics dashboard or a replacement for every hosted crash service. It is the missing report-generation and storage layer between Apple's low-level crash API and an app's own diagnostic workflow.
 
 ## Requirements
 
