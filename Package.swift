@@ -3,17 +3,22 @@
 import PackageDescription
 
 let package = Package(
-    name: "CrashReportViewer",
+    name: "CrashReportKit",
     platforms: [.iOS(.v15)],
     products: [
-        .library(name: "CrashReportViewer", targets: ["CrashReportViewer"]),
-        .library(name: "CrashReportViewerExtension", targets: ["CrashReportViewerExtension"])
+        .library(name: "CrashReportKit", targets: ["CrashReportKit"]),
+        .library(name: "CrashReportKitUI", targets: ["CrashReportKitUI"]),
+        .library(name: "CrashReportKitExtension", targets: ["CrashReportKitExtension"])
     ],
     targets: [
-        .target(name: "CrashReportViewer"),
+        .target(name: "CrashReportKit"),
         .target(
-            name: "CrashReportViewerExtension",
-            dependencies: ["CrashReportViewer"],
+            name: "CrashReportKitUI",
+            dependencies: ["CrashReportKit"]
+        ),
+        .target(
+            name: "CrashReportKitExtension",
+            dependencies: ["CrashReportKit"],
             linkerSettings: [.linkedFramework("CrashReportExtension")]
         )
     ]

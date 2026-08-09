@@ -1,9 +1,9 @@
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Finfinitepower18%2FCrashReportViewer%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/infinitepower18/CrashReportViewer)
-![GitHub](https://img.shields.io/github/license/infinitepower18/crashreportviewer)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Finfinitepower18%2FCrashReportKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/infinitepower18/CrashReportKit)
+![GitHub](https://img.shields.io/github/license/infinitepower18/CrashReportKit)
 
-# CrashReportViewer
+# CrashReportKit
 
-CrashReportViewer is a Swift package for capturing, storing, viewing, and sharing crash reports produced by Apple's [CrashReportExtension](https://developer.apple.com/documentation/CrashReportExtension) framework.
+CrashReportKit is a Swift package for capturing, storing, viewing, and sharing crash reports produced by Apple's [CrashReportExtension](https://developer.apple.com/documentation/CrashReportExtension) framework.
 
 The package generates human-readable JSON reports containing stack traces, symbols available on the device, ARM64 register state, exception information, process metadata, and relevant binary images. Unsymbolicated frames retain the addresses and binary-image metadata needed for offline symbolication with a matching dSYM. It also provides a pure SwiftUI interface for inspecting and sharing reports.
 
@@ -26,12 +26,13 @@ The package generates human-readable JSON reports containing stack traces, symbo
 
 ## Package products
 
-CrashReportViewer provides two library products:
+CrashReportKit provides three focused library products:
 
-- `CrashReportViewer` contains configuration, storage, ZIP creation, and the SwiftUI viewer.
-- `CrashReportViewerExtension` contains the low-level crash processing and depends on Apple's `CrashReportExtension` framework.
+- `CrashReportKit` contains only the underlying configuration, storage, and ZIP creation APIs.
+- `CrashReportKitUI` contains the SwiftUI viewer and depends on `CrashReportKit`.
+- `CrashReportKitExtension` contains the low-level crash processing, depends on `CrashReportKit`, and links Apple's `CrashReportExtension` framework.
 
-The app target should link `CrashReportViewer`. The Crash Report Extension target should link `CrashReportViewerExtension`.
+The app target should link `CrashReportKitUI`. The Crash Report Extension target should link `CrashReportKitExtension`. Link `CrashReportKit` directly when only the underlying APIs are needed.
 
 ## Installation
 
@@ -39,8 +40,8 @@ Add this package to the Xcode project and select the appropriate product for eac
 
 | Target | Package product |
 | --- | --- |
-| Main app | `CrashReportViewer` |
-| Crash Report Extension | `CrashReportViewerExtension` |
+| Main app | `CrashReportKitUI` |
+| Crash Report Extension | `CrashReportKitExtension` |
 
 Both targets must include the same app-group entitlement.
 
@@ -56,7 +57,7 @@ Both targets must include the same app-group entitlement.
 Create matching configurations in the app and extension targets:
 
 ```swift
-import CrashReportViewer
+import CrashReportKit
 
 let crashReportConfiguration = CrashReportConfiguration(
     appGroupIdentifier: "group.com.example.MyApp",
@@ -73,8 +74,8 @@ Keep the extension entry point in the extension target and delegate processing t
 
 ```swift
 import CrashReportExtension
-import CrashReportViewer
-import CrashReportViewerExtension
+import CrashReportKit
+import CrashReportKitExtension
 import ExtensionFoundation
 import os
 
@@ -106,7 +107,8 @@ The extension must use the same app-group identifier as the main app.
 Present `CrashReportsView` inside a `NavigationStack`:
 
 ```swift
-import CrashReportViewer
+import CrashReportKit
+import CrashReportKitUI
 import SwiftUI
 
 struct DiagnosticsView: View {
@@ -164,7 +166,7 @@ Symbol availability depends on the crashed binary. Debug builds may provide read
 
 ## Privacy
 
-CrashReportViewer does not upload or transmit reports automatically. Reports remain in the shared app-group container until the user explicitly shares them or they are removed by retention.
+CrashReportKit does not upload or transmit reports automatically. Reports remain in the shared app-group container until the user explicitly shares them or they are removed by retention.
 
 ## Platform notes
 
