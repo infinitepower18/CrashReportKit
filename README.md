@@ -7,6 +7,8 @@ CrashReportKit is a Swift package for capturing, storing, and managing crash rep
 
 The package generates human-readable JSON reports containing stack traces, symbols available on the device, ARM64 register state, exception information, process metadata, and relevant binary images. Unsymbolicated frames retain the addresses and binary-image metadata needed for offline symbolication with a matching dSYM. Apps can work with the storage APIs directly or add the optional SwiftUI interface for inspecting and sharing reports.
 
+Crash reports captured by CrashReportKit can be symbolicated using the [CrashReportKit Inspector](https://github.com/infinitepower18/CrashReportKit-Inspector) macOS app.
+
 > [!NOTE]
 > Apps containing CrashReportExtension cannot currently be uploaded to App Store Connect. (FB24235202)
 
