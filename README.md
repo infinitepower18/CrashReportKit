@@ -5,7 +5,7 @@
 
 CrashReportViewer is a Swift package for capturing, storing, viewing, and sharing crash reports produced by Apple's [CrashReportExtension](https://developer.apple.com/documentation/CrashReportExtension) framework.
 
-The package generates human-readable JSON reports containing symbolicated stacks, ARM64 register state, exception information, process metadata, and relevant binary images. It also provides a pure SwiftUI interface for inspecting and sharing the reports.
+The package generates human-readable JSON reports containing stack traces, symbols available on the device, ARM64 register state, exception information, process metadata, and relevant binary images. Unsymbolicated frames retain the addresses and binary-image metadata needed for offline symbolication with a matching dSYM. It also provides a pure SwiftUI interface for inspecting and sharing reports.
 
 > [!NOTE]
 > Apps containing CrashReportExtension cannot currently be uploaded to App Store Connect. (FB24235202)
@@ -155,11 +155,12 @@ Each JSON report includes:
 - Mach exception type and codes
 - The likely faulting thread
 - ARM64 register state
-- Unwound and symbolicated stack frames
-- Symbol names, offsets, inline status, and available source locations
-- Relevant binary-image metadata
+- Unwound stack frames
+- Symbol names, offsets, inline status, and source locations when available
+- Addresses and binary-image metadata for unsymbolicated frames
+- Relevant binary-image UUIDs and load addresses
 
-Source filenames and line numbers may be absent when the system cannot resolve them from the available symbols.
+Symbol availability depends on the crashed binary. Debug builds may provide readable app symbols directly, while release builds commonly contain unsymbolicated addresses. Release-build frames can be symbolicated offline using the matching dSYM. Source filenames, line numbers, exception messages, and other diagnostic details may not always be available.
 
 ## Privacy
 
