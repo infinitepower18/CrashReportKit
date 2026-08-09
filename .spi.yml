@@ -4,4 +4,6 @@ builder:
   configs:
     - platform: ios
       documentation_targets:
-        - CrashReportViewer
+        - CrashReportKit
+        - CrashReportKitUI
+        - CrashReportKitExtension
