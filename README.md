@@ -12,6 +12,8 @@ The package generates human-readable JSON reports containing symbolicated stacks
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F1K06VY)
 
+<img height="800" alt="Screenshot" src="https://github.com/user-attachments/assets/1bb0c38e-1bc7-40bd-a032-023282403e62" />
+
 ## Requirements
 
 - iOS 27 or later for crash reporting and the viewer
