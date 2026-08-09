@@ -1,5 +1,5 @@
 import CrashReportExtension
-import CrashReportViewer
+import CrashReportKit
 import Darwin.Mach
 import Foundation
 import os
@@ -26,7 +26,7 @@ public enum CrashReportProcessor {
     public static func process(
         _ process: CrashedProcess,
         configuration: CrashReportConfiguration,
-        logger: Logger = Logger(subsystem: "CrashReportViewer", category: "Crash Reports")
+        logger: Logger = Logger(subsystem: "CrashReportKit", category: "Crash Reports")
     ) {
         do {
             let report = CrashReportBuilder(process: process, appName: configuration.appName).build()

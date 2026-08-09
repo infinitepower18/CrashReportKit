@@ -1,3 +1,4 @@
+import CrashReportKit
 import SwiftUI
 
 @available(iOS 27.0, *)
