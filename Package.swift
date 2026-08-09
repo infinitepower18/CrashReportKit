@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "CrashReportViewer",
-    platforms: [.iOS(.v27)],
+    platforms: [.iOS(.v15)],
     products: [
         .library(name: "CrashReportViewer", targets: ["CrashReportViewer"]),
         .library(name: "CrashReportViewerExtension", targets: ["CrashReportViewerExtension"])
