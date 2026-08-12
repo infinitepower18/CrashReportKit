@@ -17,9 +17,6 @@ Reports include thread backtraces, symbols available on the device, ARM64 regist
 
 Use the storage APIs to build a custom workflow, or add the optional SwiftUI product to let users inspect and share reports from the app. Crash reports can also be symbolicated locally with the [CrashReportKit Inspector](https://github.com/infinitepower18/CrashReportKit-Inspector) macOS app.
 
-> [!NOTE]
-> Apps containing CrashReportExtension cannot currently be uploaded to App Store Connect. (FB24235202)
-
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F1K06VY)
 
 ## Why CrashReportKit?
